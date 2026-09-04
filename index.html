@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏴‍☠️ CineVota - Conselho dos Piratas</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=MedievalSharp&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="container">
+        <!-- Header Pirata -->
+        <header class="header">
+            <div class="header-bg">
+                <div class="waves">
+                    <span>~</span><span>~</span><span>~</span>
+                    <span>~</span><span>~</span><span>~</span>
+                </div>
+            </div>
+            <div class="header-content">
+                <div class="header-icons">
+                    <span class="icon">🏴‍☠️</span>
+                    <h1>CineVota</h1>
+                    <span class="icon">⚓</span>
+                </div>
+                <p class="subtitle">"O Conselho dos Piratas decide o próximo filme!"</p>
+                <div class="pirate-card ip-info">
+                    <span>🏴‍☠️ Cada pirata vota uma única vez</span>
+                </div>
+            </div>
+            <div class="header-decoration">
+                <span>⚓</span>
+                <span>✠</span>
+                <span>⚓</span>
+                <span>✠</span>
+                <span>⚓</span>
+            </div>
+        </header>
+
+        <!-- Status do Voto -->
+        <div id="status-voto" class="status-bar pirate-card">
+            <div class="status-content">
+                <span id="status-text">🔍 Verificando o pergaminho...</span>
+            </div>
+        </div>
+
+        <!-- Navegação Pirata -->
+        <nav class="nav-tabs">
+            <button class="tab-btn active" data-tab="votacao">
+                <span>🗡️</span> Votação
+            </button>
+            <button class="tab-btn" data-tab="resultados">
+                <span>📜</span> Resultados
+            </button>
+            <button class="tab-btn" data-tab="estatisticas">
+                <span>⚓</span> Estatísticas
+            </button>
+        </nav>
+
+        <!-- Aba de Votação -->
+        <div id="votacao" class="tab-content active">
+            <div class="votacao-container">
+                <div class="voter-info pirate-card">
+                    <h2>⚔️ Escolha seu tesouro cinematográfico</h2>
+                    <p class="info-text">
+                        Navegue pelos mares do cinema e faça sua escolha!
+                        <br>
+                        <small>⚠️ Cada pirata pode votar apenas uma vez.</small>
+                    </p>
+                    <div class="divider">✦ ✧ ✦</div>
+                </div>
+
+                <div id="loading-filmes" class="loading">🏴‍☠️ Carregando tesouros...</div>
+                <div class="filmes-grid" id="filmes-grid" style="display:none;"></div>
+
+                <div id="mensagem" class="mensagem"></div>
+            </div>
+        </div>
+
+        <!-- Aba de Resultados -->
+        <div id="resultados" class="tab-content">
+            <div class="resultados-container">
+                <h2>📜 O Tesouro Revelado</h2>
+                <div id="resultados-content">
+                    <div class="loading">Carregando o mapa...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Aba de Estatísticas -->
+        <div id="estatisticas" class="tab-content">
+            <div class="estatisticas-container">
+                <h2>⚓ O Livro dos Piratas</h2>
+                <div id="estatisticas-content">
+                    <div class="loading">Contando as moedas...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<!-- Aba de Estatísticas -->
+        <div id="estatisticas" class="tab-content">
+            <div class="estatisticas-container">
+                <h2>⚓ O Livro dos Piratas</h2>
+                <div id="estatisticas-content">
+                    <div class="loading">Contando as moedas...</div>
+                </div>
+            </div>
+            
+            <!-- Painel de Administração -->
+            <div class="pirate-card" style="margin-top: 30px; padding: 20px; border-color: var(--accent);">
+                <h3>🗝️ Acesso do Capitão (Painel ADM)</h3>
+                <div style="margin-top: 10px; display: flex; gap: 10px; flex-wrap: wrap;">
+                    <input type="password" id="admin-pass" placeholder="Senha do Capitão" style="padding: 8px; border-radius: 5px; border: 1px solid var(--primary-dark); background: #1A0F0A; color: #fff;">
+                    <button onclick="liberarIP()" class="votar-btn" style="width: auto; margin: 0;">🔓 Liberar Meu IP</button>
+                    <button onclick="resetarTodosIPs()" class="votar-btn" style="width: auto; margin: 0; background: var(--accent);">🔥 Zerar Todos os IPs</button>
+                </div>
+                <div id="admin-msg" style="margin-top: 10px; font-size: 0.9rem;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
