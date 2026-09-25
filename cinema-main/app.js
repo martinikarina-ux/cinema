@@ -36,30 +36,30 @@ const FILMES_MOCK = [
     },
     {
         id: 4,
-        titulo: "Guardiões Da Galáxia",
+        titulo: "Guardiões da Galáxia",
         genero: "Ação/Ficção científica",
         ano: 2014,
-        imagem: "🦝༘⋆📼˚ ༘ ೀ",
+        imagem: "🦝༘⋆📼 ೀ",
         avaliacao: "⭐⭐⭐⭐☆",
         sinopse: "O aventureiro do espaço, Peter Quill, torna-se presa de caçadores de recompensas após roubar a esfera do vilão traiçoeiro, Ronan. Para escapar do perigo, faz uma aliança com um grupo de quatro extraterrestres. Quill descobre que a esfera foi roubada e possui um poder capaz de mudar os rumos do universo. Ele e seu grupo precisam proteger o objeto para salvar o futuro da galáxia."
     },
     {
         id: 5,
-        titulo: "Capitão Phillips",
-        genero: "Biografia / Drama",
-        ano: 2013,
-        imagem: "⚓",
+        titulo: "De Volta para o Futuro",
+        genero: "Ficção científica/Comédia",
+        ano: 1985,
+        imagem: "🚘",
         avaliacao: "⭐⭐⭐⭐⭐",
-        sinopse: "A história real do sequestro do navio MV Maersk Alabama por piratas somalis."
+        sinopse: "O adolescente Marty McFly é transportado para o ano de 1955 quando uma experiência do excêntrico cientista Doc Brown é malsucedida. Marty viaja pelo tempo em um carro modificado e acaba conhecendo seus pais ainda jovens. O problema é que ele pode deixar de existir porque interferiu na rotina dos pais, que correm o risco de não se apaixonarem mais. Para complicar ainda mais a situação, Marty precisa voltar para casa a tempo de salvar o cientista."
     },
     {
         id: 6,
-        titulo: "Capitão Phillips",
-        genero: "Biografia / Drama",
-        ano: 2013,
-        imagem: "⚓",
-        avaliacao: "⭐⭐⭐⭐⭐",
-        sinopse: "A história real do sequestro do navio MV Maersk Alabama por piratas somalis."
+        titulo: "Sexta-feira 13",
+        genero: "Terror/Crime",
+        ano: 1980,
+        imagem: "🔪",
+        avaliacao: "⭐⭐⭐☆☆",
+        sinopse: "Um grupo de monitores é brutalmente assassinado, um a um, em um acampamento de verão realizado no Camp Crystal Lake, quando o empresário Steve Christie reabre o local, que estava fechado há anos."
     }
 ];
 
