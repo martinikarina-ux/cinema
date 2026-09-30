@@ -1,15 +1,21 @@
 // ==========================================
-// CONFIGURAÇÕES GERAIS E BANCO
+// CONFIGURAÇÕES GERAIS E BANCO (JSONBin)
 // ==========================================
-const BIN_ID = '6a9ab03cf5f4af5e2969c9d5';
-const API_KEY = '$2a$10$qJQyHCicBIBm9RJzr7tzFed0uQkAvUuywD9WXi5XHe6KJIbWKVlKy';
+// 1. Crie conta em https://jsonbin.io
+// 2. Vá em API Keys e copie a Master Key
+// 3. Crie um Bin com o JSON inicial:
+//    { "votos": [], "ultimosVotantes": [], "ipsVotantes": [] }
+// 4. Cole o Bin ID e a Master Key abaixo
+
+const BIN_ID = '6abcf5ffac6210605a0531a4';                                    // ← troque aqui
+const API_KEY = '$2a$10$Flk.vXmwEjLcATGnY6FI1O6G3QXQS2UNjuKGJOgqF3gbyzDf56TIS';                        // ← troque aqui
 const JSONBIN_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
 const SENHA_ADM = 'pirata123'; // Senha para o painel de administração
 
 const FILMES_MOCK = [
     {
         id: 1,
-        titulo: "Piratas do Caribe: A Maldição do Peróla Negra",
+        titulo: "Piratas do Caribe: A Maldição do Pérola Negra",
         genero: "Aventura / Fantasia",
         ano: 2003,
         imagem: "🏴‍☠️",
@@ -82,10 +88,18 @@ async function obterIP() {
 // ==========================================
 async function buscarDadosOnline() {
     try {
-        const response = await fetch(JSONBIN_URL, {
+        const response = await fetch(`${JSONBIN_URL}/latest`, {
             method: 'GET',
-            headers: { 'X-Master-Key': API_KEY }
+            headers: {
+                'X-Master-Key': API_KEY
+            }
         });
+
+        if (!response.ok) {
+            console.error('Erro HTTP ao buscar dados:', response.status);
+            return { votos: [], ultimosVotantes: [], ipsVotantes: [] };
+        }
+
         const data = await response.json();
         return data.record || { votos: [], ultimosVotantes: [], ipsVotantes: [] };
     } catch (error) {
@@ -94,19 +108,49 @@ async function buscarDadosOnline() {
     }
 }
 
-async function salvarDadosOnline(novosDados) {
+// Função que estava FALTANDO no código original
+async function salvarDadosOnline(dados) {
     try {
-        await fetch(JSONBIN_URL, {
+        const response = await fetch(JSONBIN_URL, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
                 'X-Master-Key': API_KEY
             },
-            body: JSON.stringify(novosDados)
+            body: JSON.stringify(dados)
         });
+
+        if (!response.ok) {
+            const erro = await response.text();
+            console.error('Erro ao salvar dados:', response.status, erro);
+            throw new Error(`Falha ao salvar (${response.status})`);
+        }
+
+        console.log('Dados salvos com sucesso!');
+        return true;
     } catch (error) {
-        console.error('Erro ao salvar dados:', error);
+        console.error('Erro ao salvar dados online:', error);
+        throw error;
     }
+}
+
+async function registrarVoto(novoVoto, nomeVotante, ipUsuario) {
+    const dados = await buscarDadosOnline();
+    dados.votos.push(novoVoto);
+    dados.ultimosVotantes.push(nomeVotante);
+    dados.ipsVotantes.push(ipUsuario);
+    await salvarDadosOnline(dados);
+    console.log('Dados salvos com sucesso!');
+}
+
+async function resetarBanco() {
+    const dadosLimpos = {
+        votos: [],
+        ultimosVotantes: [],
+        ipsVotantes: []
+    };
+    await salvarDadosOnline(dadosLimpos);
+    console.log('Banco de dados resetado!');
 }
 
 // ==========================================
@@ -116,11 +160,20 @@ async function votar(idFilme, tituloFilme) {
     const statusText = document.getElementById('status-text');
     if (statusText) statusText.textContent = '🔍 Verificando pergaminhos do IP...';
 
+    // Validação básica das credenciais
+    if (BIN_ID.includes('SEU_BIN') || API_KEY.includes('SUA_MASTER')) {
+        alert('⚠️ Configure o BIN_ID e a API_KEY no arquivo app.js antes de usar!');
+        if (statusText) statusText.textContent = '❌ Credenciais do JSONBin não configuradas.';
+        return;
+    }
+
     const userIP = await obterIP();
     const dadosAtuais = await buscarDadosOnline();
 
     // Garante que o array de IPs existe no JSON
     if (!dadosAtuais.ipsVotantes) dadosAtuais.ipsVotantes = [];
+    if (!dadosAtuais.votos) dadosAtuais.votos = [];
+    if (!dadosAtuais.ultimosVotantes) dadosAtuais.ultimosVotantes = [];
 
     // Validação de Voto Único por IP
     if (dadosAtuais.ipsVotantes.includes(userIP)) {
@@ -141,15 +194,20 @@ async function votar(idFilme, tituloFilme) {
         data: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
     });
 
+    // Mantém só os 10 últimos
     dadosAtuais.ultimosVotantes = dadosAtuais.ultimosVotantes.slice(0, 10);
 
-    await salvarDadosOnline(dadosAtuais);
+    try {
+        await salvarDadosOnline(dadosAtuais);
 
-    if (statusText) {
-        statusText.innerHTML = `✅ Voto de <strong>${nomePirata}</strong> registrado!`;
+        if (statusText) {
+            statusText.innerHTML = `✅ Voto de <strong>${nomePirata}</strong> registrado!`;
+        }
+        alert(`⚔️ Voto salvo com sucesso, Capitão ${nomePirata}!`);
+    } catch (error) {
+        alert('❌ Não foi possível salvar o voto. Verifique as credenciais do JSONBin.');
+        if (statusText) statusText.textContent = '❌ Falha ao salvar o voto.';
     }
-
-    alert(`⚔️ Voto salvo com sucesso, Capitão ${nomePirata}!`);
 }
 
 // ==========================================
@@ -172,8 +230,12 @@ async function liberarIP() {
     // Remove o IP do usuário da lista de bloqueio
     dadosAtuais.ipsVotantes = dadosAtuais.ipsVotantes.filter(ip => ip !== userIP);
 
-    await salvarDadosOnline(dadosAtuais);
-    msg.innerHTML = `<span style="color: var(--gold);">✅ O IP (${userIP}) foi liberado para votar novamente!</span>`;
+    try {
+        await salvarDadosOnline(dadosAtuais);
+        msg.innerHTML = `<span style="color: var(--gold);">✅ O IP (${userIP}) foi liberado para votar novamente!</span>`;
+    } catch (error) {
+        msg.innerHTML = `<span style="color: var(--accent);">❌ Erro ao liberar IP.</span>`;
+    }
 }
 
 async function resetarTodosIPs() {
@@ -188,8 +250,12 @@ async function resetarTodosIPs() {
     const dadosAtuais = await buscarDadosOnline();
     dadosAtuais.ipsVotantes = [];
 
-    await salvarDadosOnline(dadosAtuais);
-    msg.innerHTML = `<span style="color: var(--gold);">🔥 Todos os IPs foram zerados do banco de dados!</span>`;
+    try {
+        await salvarDadosOnline(dadosAtuais);
+        msg.innerHTML = `<span style="color: var(--gold);">🔥 Todos os IPs foram zerados do banco de dados!</span>`;
+    } catch (error) {
+        msg.innerHTML = `<span style="color: var(--accent);">❌ Erro ao zerar os IPs.</span>`;
+    }
 }
 
 // ==========================================
@@ -200,7 +266,7 @@ async function carregarResultados() {
     resContent.innerHTML = `<div class="loading">Buscando mapa de votos atualizado...</div>`;
 
     const dados = await buscarDadosOnline();
-    const totalVotos = dados.votos.length;
+    const totalVotos = (dados.votos || []).length;
 
     if (totalVotos === 0) {
         resContent.innerHTML = `<p style="text-align: center;">📜 Nenhum voto computado até o momento.</p>`;
@@ -230,10 +296,13 @@ async function carregarEstatisticas() {
     statContent.innerHTML = `<div class="loading">Contando as moedas do baú...</div>`;
 
     const dados = await buscarDadosOnline();
-    const totalVotos = dados.votos.length;
+    const totalVotos = (dados.votos || []).length;
+    const totalIPs = (dados.ipsVotantes || []).length;
 
-    const listaVotantesHTML = dados.ultimosVotantes && dados.ultimosVotantes.length > 0 
-        ? dados.ultimosVotantes.map(v => `<li><strong>${v.nome}</strong> votou em <em>${v.filme}</em> às ${v.data} (IP: ${v.ip || 'Oculto'})</li>`).join('')
+    const listaVotantesHTML = dados.ultimosVotantes && dados.ultimosVotantes.length > 0
+        ? dados.ultimosVotantes.map(v =>
+            `<li><strong>${v.nome}</strong> votou em <em>${v.filme}</em> às ${v.data} (IP: ${v.ip || 'Oculto'})</li>`
+          ).join('')
         : '<li>Nenhum pirata votou ainda.</li>';
 
     statContent.innerHTML = `
@@ -243,7 +312,7 @@ async function carregarEstatisticas() {
                 <span class="label">Total de Votos Registrados</span>
             </div>
             <div class="stat-card">
-                <span class="numero">${dados.ipsVotantes ? dados.ipsVotantes.length : 0}</span>
+                <span class="numero">${totalIPs}</span>
                 <span class="label">IPs Registrados</span>
             </div>
         </div>
@@ -297,7 +366,7 @@ function carregarFilmes() {
                 <span class="ano">${filme.ano}</span>
                 <div style="margin: 8px 0; font-size: 1.1rem;">${filme.avaliacao}</div>
                 <p class="sinopse">${filme.sinopse}</p>
-                <button class="votar-btn" onclick="votar(${filme.id}, '${filme.titulo}')">🗡️ Escolher</button>
+                <button class="votar-btn" onclick="votar(${filme.id}, '${filme.titulo.replace(/'/g, "\\'")}')">🗡️ Escolher</button>
             </div>
         `).join('');
     }, 500);

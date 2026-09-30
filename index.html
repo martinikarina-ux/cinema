@@ -5,7 +5,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🏴‍☠️ CineVota - Conselho dos Piratas</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link
         href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=MedievalSharp&display=swap"
         rel="stylesheet">
@@ -92,39 +91,32 @@
             </div>
         </div>
 
-        <!-- Aba de Estatísticas -->
+        <!-- Aba de Estatísticas + Painel ADM -->
         <div id="estatisticas" class="tab-content">
             <div class="estatisticas-container">
                 <h2>⚓ O Livro dos Piratas</h2>
                 <div id="estatisticas-content">
                     <div class="loading">Contando as moedas...</div>
                 </div>
-            </div>
-        </div>
-    </div>
 
-<!-- Aba de Estatísticas -->
-        <div id="estatisticas" class="tab-content">
-            <div class="estatisticas-container">
-                <h2>⚓ O Livro dos Piratas</h2>
-                <div id="estatisticas-content">
-                    <div class="loading">Contando as moedas...</div>
+                <!-- Painel de Administração -->
+                <div class="pirate-card" style="margin-top: 30px; padding: 20px; border-color: var(--accent);">
+                    <h3>🗝️ Acesso do Capitão (Painel ADM)</h3>
+                    <div style="margin-top: 10px; display: flex; gap: 10px; flex-wrap: wrap;">
+                        <input type="password" id="admin-pass" placeholder="Senha do Capitão"
+                            style="padding: 8px; border-radius: 5px; border: 1px solid var(--primary-dark); background: #1A0F0A; color: #fff;">
+                        <button onclick="liberarIP()" class="votar-btn" style="width: auto; margin: 0;">🔓 Liberar Meu
+                            IP</button>
+                        <button onclick="resetarTodosIPs()" class="votar-btn"
+                            style="width: auto; margin: 0; background: var(--accent);">🔥 Zerar Todos os IPs</button>
+                    </div>
+                    <div id="admin-msg" style="margin-top: 10px; font-size: 0.9rem;"></div>
                 </div>
-            </div>
-            
-            <!-- Painel de Administração -->
-            <div class="pirate-card" style="margin-top: 30px; padding: 20px; border-color: var(--accent);">
-                <h3>🗝️ Acesso do Capitão (Painel ADM)</h3>
-                <div style="margin-top: 10px; display: flex; gap: 10px; flex-wrap: wrap;">
-                    <input type="password" id="admin-pass" placeholder="Senha do Capitão" style="padding: 8px; border-radius: 5px; border: 1px solid var(--primary-dark); background: #1A0F0A; color: #fff;">
-                    <button onclick="liberarIP()" class="votar-btn" style="width: auto; margin: 0;">🔓 Liberar Meu IP</button>
-                    <button onclick="resetarTodosIPs()" class="votar-btn" style="width: auto; margin: 0; background: var(--accent);">🔥 Zerar Todos os IPs</button>
-                </div>
-                <div id="admin-msg" style="margin-top: 10px; font-size: 0.9rem;"></div>
             </div>
         </div>
     </div>
 
     <script src="app.js"></script>
 </body>
+
 </html>
