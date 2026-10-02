@@ -673,6 +673,152 @@ body::before {
     background: var(--gold-dark);
 }
 
+/* ==========================================
+   SELEÇÃO DE ASSENTOS (MAPA DO NAVIO)
+   ========================================== */
+.assentos-section {
+    padding: 25px;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.assentos-section h3 {
+    color: var(--gold);
+    font-family: 'Cinzel Decorative', cursive;
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+    text-shadow: 0 0 20px rgba(255, 215, 0, 0.15);
+}
+
+.tela-cinema {
+    background: linear-gradient(180deg, #2C1810 0%, #1A0F0A 100%);
+    border: 2px solid var(--gold-dark);
+    border-radius: 8px 8px 40% 40%;
+    padding: 12px 20px;
+    margin: 0 auto 25px;
+    max-width: 420px;
+    color: var(--gold);
+    font-family: 'Cinzel Decorative', cursive;
+    font-size: 0.95rem;
+    letter-spacing: 2px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.5), inset 0 0 20px rgba(255,215,0,0.05);
+}
+
+.mapa-assentos {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    margin: 0 auto 20px;
+    max-width: 520px;
+    overflow-x: auto;
+    padding: 10px 0;
+}
+
+.fileira {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.fileira-label {
+    width: 24px;
+    font-weight: 700;
+    color: var(--gold-dark);
+    font-family: 'Cinzel Decorative', cursive;
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+.seat {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px 6px 10px 10px;
+    border: 2px solid var(--primary-dark);
+    background: linear-gradient(180deg, #3a2a1a 0%, #2C1810 100%);
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.65rem;
+    color: var(--text-dark);
+    font-family: 'MedievalSharp', cursive;
+    position: relative;
+}
+
+.seat:hover:not(.ocupado):not(.selecionado) {
+    border-color: var(--gold);
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(255, 215, 0, 0.25);
+    color: var(--gold);
+}
+
+.seat.livre {
+    background: linear-gradient(180deg, #2d4a2d 0%, #1a3a1a 100%);
+    border-color: #3a6b3a;
+}
+
+.seat.selecionado {
+    background: linear-gradient(180deg, var(--gold) 0%, var(--gold-dark) 100%);
+    border-color: var(--gold);
+    color: var(--dark);
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+    transform: scale(1.08);
+}
+
+.seat.ocupado {
+    background: linear-gradient(180deg, #5c1a1a 0%, #3a0f0f 100%);
+    border-color: var(--accent);
+    cursor: not-allowed;
+    opacity: 0.75;
+}
+
+.seat.ocupado::after {
+    content: '✕';
+    position: absolute;
+    font-size: 0.8rem;
+    color: #ff6b6b;
+}
+
+.corredor {
+    width: 18px;
+}
+
+.legenda-assentos {
+    display: flex;
+    justify-content: center;
+    gap: 25px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+    font-size: 0.85rem;
+    color: var(--text-dark);
+}
+
+.legenda-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.legenda-item .seat {
+    width: 20px;
+    height: 20px;
+    cursor: default;
+    pointer-events: none;
+}
+
+#assento-selecionado-texto {
+    display: inline-block;
+    margin-top: 6px;
+    padding: 4px 14px;
+    background: rgba(139, 105, 20, 0.15);
+    border-radius: 20px;
+    border: 1px solid var(--primary-dark);
+    color: var(--gold);
+    font-weight: 700;
+}
+
 /* Responsivo */
 @media (max-width: 768px) {
     .container {
@@ -718,6 +864,26 @@ body::before {
         flex-direction: column;
         align-items: flex-start;
     }
+
+    .seat {
+        width: 26px;
+        height: 26px;
+        font-size: 0.55rem;
+    }
+
+    .fileira-label {
+        width: 18px;
+        font-size: 0.75rem;
+    }
+
+    .corredor {
+        width: 12px;
+    }
+
+    .tela-cinema {
+        font-size: 0.8rem;
+        max-width: 95%;
+    }
 }
 
 @media (max-width: 480px) {
@@ -742,4 +908,201 @@ body::before {
     .voter-info h2 {
         font-size: 1.2rem;
     }
+}
+
+/* ==========================================
+   TELA DE LOGIN
+   ========================================== */
+.tela-login {
+    position: fixed;
+    inset: 0;
+    background: #0A0604;
+    background-image:
+        radial-gradient(ellipse at 30% 40%, #1A0F0A 0%, transparent 60%),
+        radial-gradient(ellipse at 70% 60%, #2C1810 0%, transparent 50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 20px;
+}
+
+.login-card {
+    max-width: 420px;
+    width: 100%;
+    padding: 35px 30px;
+    text-align: center;
+}
+
+.login-header .icon {
+    font-size: 3rem;
+    display: block;
+    margin-bottom: 10px;
+}
+
+.login-header h1 {
+    font-family: 'Cinzel Decorative', cursive;
+    color: var(--gold);
+    font-size: 2.4rem;
+    margin-bottom: 5px;
+    text-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
+}
+
+.login-header p {
+    color: var(--text-dark);
+    margin-bottom: 25px;
+    letter-spacing: 1px;
+}
+
+.login-form {
+    text-align: left;
+}
+
+.login-form label {
+    display: block;
+    color: var(--gold-dark);
+    font-size: 0.85rem;
+    margin-bottom: 5px;
+    margin-top: 15px;
+    font-family: 'Cinzel Decorative', cursive;
+}
+
+.login-form input {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 8px;
+    border: 1px solid var(--primary-dark);
+    background: #1A0F0A;
+    color: var(--text-light);
+    font-size: 1rem;
+    font-family: 'MedievalSharp', cursive;
+}
+
+.login-form input:focus {
+    outline: none;
+    border-color: var(--gold);
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.15);
+}
+
+.login-dica {
+    font-size: 0.8rem;
+    color: var(--text-dark);
+    margin: 15px 0 20px;
+    line-height: 1.4;
+}
+
+.login-msg {
+    margin-top: 15px;
+    font-size: 0.95rem;
+    text-align: center;
+}
+
+.btn-logout {
+    background: transparent;
+    border: 1px solid var(--primary-dark);
+    color: var(--text-dark);
+    padding: 4px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    margin-left: 12px;
+    transition: var(--transition);
+}
+
+.btn-logout:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+/* ==========================================
+   ETAPAS DE VOTAÇÃO
+   ========================================== */
+.etapas-voto {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+}
+
+.etapa {
+    padding: 8px 18px;
+    border-radius: 20px;
+    background: rgba(44, 24, 16, 0.6);
+    border: 1px solid var(--primary-dark);
+    color: var(--text-dark);
+    font-size: 0.85rem;
+    font-family: 'Cinzel Decorative', cursive;
+}
+
+.etapa.active {
+    background: rgba(139, 105, 20, 0.25);
+    border-color: var(--gold);
+    color: var(--gold);
+}
+
+.etapa.concluida {
+    background: rgba(58, 107, 58, 0.2);
+    border-color: #3a6b3a;
+    color: #7dba7d;
+}
+
+.etapa-seta {
+    color: var(--gold-dark);
+    opacity: 0.6;
+}
+
+.btn-voltar {
+    background: transparent !important;
+    border-color: var(--primary-dark) !important;
+    color: var(--text) !important;
+    width: auto !important;
+    margin: 10px auto !important;
+}
+
+.btn-voltar:hover {
+    border-color: var(--gold-dark) !important;
+    color: var(--gold) !important;
+}
+
+.resumo-voto {
+    background: rgba(26, 15, 10, 0.6);
+    border: 1px solid var(--primary-dark);
+    border-radius: 10px;
+    padding: 20px;
+    margin: 20px auto;
+    max-width: 400px;
+    text-align: left;
+    line-height: 2;
+}
+
+.resumo-voto strong {
+    color: var(--gold-dark);
+}
+
+.voto-admin-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    background: rgba(26, 15, 10, 0.5);
+    border: 1px solid var(--primary-dark);
+    border-radius: 8px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.voto-admin-item .info {
+    flex: 1;
+    font-size: 0.9rem;
+}
+
+.voto-admin-item button {
+    padding: 6px 14px;
+    font-size: 0.75rem;
+    width: auto;
+    margin: 0;
+    background: var(--accent);
 }

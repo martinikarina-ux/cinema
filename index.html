@@ -12,7 +12,31 @@
 </head>
 
 <body>
-    <div class="container">
+    <!-- ==================== TELA DE LOGIN ==================== -->
+    <div id="tela-login" class="tela-login">
+        <div class="login-card pirate-card">
+            <div class="login-header">
+                <span class="icon">🏴‍☠️</span>
+                <h1>CineVota</h1>
+                <p>"Entre no Conselho dos Piratas"</p>
+            </div>
+            <div class="login-form">
+                <label>Nome de Pirata</label>
+                <input type="text" id="login-nome" placeholder="Ex: Capitão Jack" maxlength="30" autocomplete="username">
+                
+                <label>Senha do Cadastro</label>
+                <input type="password" id="login-senha" placeholder="Crie ou digite sua senha" maxlength="40" autocomplete="current-password">
+                
+                <p class="login-dica">Se for a primeira vez, a senha será criada. Guarde-a para liberar seu assento depois.</p>
+                
+                <button id="btn-entrar" class="votar-btn" onclick="fazerLogin()">⚔️ Entrar no Conselho</button>
+                <div id="login-msg" class="login-msg"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== APP PRINCIPAL (oculto até login) ==================== -->
+    <div id="app-principal" class="container" style="display: none;">
         <!-- Header Pirata -->
         <header class="header">
             <div class="header-bg">
@@ -29,15 +53,12 @@
                 </div>
                 <p class="subtitle">"O Conselho dos Piratas decide o próximo filme!"</p>
                 <div class="pirate-card ip-info">
-                    <span>🏴‍☠️ Cada pirata vota uma única vez</span>
+                    <span id="usuario-logado">🏴‍☠️ Cada pirata vota uma única vez</span>
+                    <button onclick="fazerLogout()" class="btn-logout" title="Sair">🚪 Sair</button>
                 </div>
             </div>
             <div class="header-decoration">
-                <span>⚓</span>
-                <span>✠</span>
-                <span>⚓</span>
-                <span>✠</span>
-                <span>⚓</span>
+                <span>⚓</span><span>✠</span><span>⚓</span><span>✠</span><span>⚓</span>
             </div>
         </header>
 
@@ -59,29 +80,88 @@
             <button class="tab-btn" data-tab="estatisticas">
                 <span>⚓</span> Estatísticas
             </button>
+            <button class="tab-btn" data-tab="admin">
+                <span>🗝️</span> Administração
+            </button>
         </nav>
 
-        <!-- Aba de Votação -->
+        <!-- ========== ABA VOTAÇÃO (fluxo em etapas) ========== -->
         <div id="votacao" class="tab-content active">
             <div class="votacao-container">
-                <div class="voter-info pirate-card">
-                    <h2>⚔️ Escolha seu tesouro cinematográfico</h2>
-                    <p class="info-text">
-                        Navegue pelos mares do cinema e faça sua escolha!
-                        <br>
-                        <small>⚠️ Cada pirata pode votar apenas uma vez.</small>
-                    </p>
-                    <div class="divider">✦ ✧ ✦</div>
+
+                <!-- Indicador de etapas -->
+                <div class="etapas-voto">
+                    <div class="etapa active" id="etapa-1-ind">1. Filme</div>
+                    <div class="etapa-seta">→</div>
+                    <div class="etapa" id="etapa-2-ind">2. Assento</div>
+                    <div class="etapa-seta">→</div>
+                    <div class="etapa" id="etapa-3-ind">3. Confirmar</div>
                 </div>
 
-                <div id="loading-filmes" class="loading">🏴‍☠️ Carregando tesouros...</div>
-                <div class="filmes-grid" id="filmes-grid" style="display:none;"></div>
+                <!-- ETAPA 1: Escolher Filme -->
+                <div id="etapa-filme" class="etapa-conteudo">
+                    <div class="voter-info pirate-card">
+                        <h2>⚔️ Escolha seu tesouro cinematográfico</h2>
+                        <p class="info-text">
+                            Selecione o filme que deseja assistir.
+                            <br><small>Depois você escolherá o assento.</small>
+                        </p>
+                        <div class="divider">✦ ✧ ✦</div>
+                    </div>
+                    <div id="loading-filmes" class="loading">🏴‍☠️ Carregando tesouros...</div>
+                    <div class="filmes-grid" id="filmes-grid" style="display:none;"></div>
+                </div>
+
+                <!-- ETAPA 2: Escolher Assento -->
+                <div id="etapa-assento" class="etapa-conteudo" style="display:none;">
+                    <div class="voter-info pirate-card">
+                        <h2>🪑 Escolha o seu Assento no Navio</h2>
+                        <p class="info-text">
+                            Filme selecionado: <strong id="filme-escolhido-nome">—</strong>
+                            <br>
+                            Clique em um assento livre (verde).
+                        </p>
+                        <button class="votar-btn btn-voltar" onclick="voltarParaFilmes()">← Voltar aos filmes</button>
+                    </div>
+
+                    <div class="assentos-section pirate-card">
+                        <div class="tela-cinema">🎬 TELA / PROA DO NAVIO 🎬</div>
+                        <div id="mapa-assentos" class="mapa-assentos"></div>
+                        <div class="legenda-assentos">
+                            <span class="legenda-item"><span class="seat livre"></span> Livre</span>
+                            <span class="legenda-item"><span class="seat selecionado"></span> Seu</span>
+                            <span class="legenda-item"><span class="seat ocupado"></span> Ocupado</span>
+                        </div>
+                        <p id="assento-selecionado-texto" style="margin-top:15px;">Nenhum assento selecionado</p>
+                        <button class="votar-btn" id="btn-ir-confirmar" onclick="irParaConfirmacao()" style="margin-top:20px; max-width:300px;" disabled>
+                            ➡️ Confirmar Assento
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ETAPA 3: Confirmação -->
+                <div id="etapa-confirma" class="etapa-conteudo" style="display:none;">
+                    <div class="voter-info pirate-card">
+                        <h2>⚓ Confirme seu Voto</h2>
+                        <div class="resumo-voto">
+                            <p>🏴‍☠️ <strong>Pirata:</strong> <span id="resumo-nome">—</span></p>
+                            <p>🎬 <strong>Filme:</strong> <span id="resumo-filme">—</span></p>
+                            <p>🪑 <strong>Assento:</strong> <span id="resumo-assento">—</span></p>
+                        </div>
+                        <div style="display:flex; gap:15px; justify-content:center; flex-wrap:wrap; margin-top:25px;">
+                            <button class="votar-btn btn-voltar" onclick="voltarParaAssentos()">← Trocar Assento</button>
+                            <button class="votar-btn" onclick="confirmarVotoFinal()" style="background: linear-gradient(135deg, #3a6b3a, #1a3a1a); border-color:#3a6b3a;">
+                                ⚔️ Confirmar Voto Final
+                            </button>
+                        </div>
+                    </div>
+                </div>
 
                 <div id="mensagem" class="mensagem"></div>
             </div>
         </div>
 
-        <!-- Aba de Resultados -->
+        <!-- ========== ABA RESULTADOS ========== -->
         <div id="resultados" class="tab-content">
             <div class="resultados-container">
                 <h2>📜 O Tesouro Revelado</h2>
@@ -91,7 +171,7 @@
             </div>
         </div>
 
-        <!-- Aba de Estatísticas + Painel ADM -->
+        <!-- ========== ABA ESTATÍSTICAS ========== -->
         <div id="estatisticas" class="tab-content">
             <div class="estatisticas-container">
                 <h2>⚓ O Livro dos Piratas</h2>
@@ -99,18 +179,80 @@
                     <div class="loading">Contando as moedas...</div>
                 </div>
 
-                <!-- Painel de Administração -->
-                <div class="pirate-card" style="margin-top: 30px; padding: 20px; border-color: var(--accent);">
-                    <h3>🗝️ Acesso do Capitão (Painel ADM)</h3>
-                    <div style="margin-top: 10px; display: flex; gap: 10px; flex-wrap: wrap;">
-                        <input type="password" id="admin-pass" placeholder="Senha do Capitão"
-                            style="padding: 8px; border-radius: 5px; border: 1px solid var(--primary-dark); background: #1A0F0A; color: #fff;">
-                        <button onclick="liberarIP()" class="votar-btn" style="width: auto; margin: 0;">🔓 Liberar Meu
-                            IP</button>
-                        <button onclick="resetarTodosIPs()" class="votar-btn"
-                            style="width: auto; margin: 0; background: var(--accent);">🔥 Zerar Todos os IPs</button>
+                <!-- Liberar meu assento -->
+                <div class="pirate-card" style="margin-top: 30px; padding: 20px;">
+                    <h3>🔓 Liberar Meu Assento</h3>
+                    <p style="font-size:0.9rem; margin:10px 0; color:var(--text-dark);">
+                        Digite a senha do seu cadastro (ou a senha do Capitão) para liberar o assento que você ocupa.
+                    </p>
+                    <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;">
+                        <input type="password" id="senha-liberar" placeholder="Senha do cadastro ou ADM"
+                            style="padding:8px; border-radius:5px; border:1px solid var(--primary-dark); background:#1A0F0A; color:#fff; flex:1; min-width:180px;">
+                        <button onclick="liberarMeuAssento()" class="votar-btn" style="width:auto; margin:0;">🔓 Liberar Assento</button>
                     </div>
-                    <div id="admin-msg" style="margin-top: 10px; font-size: 0.9rem;"></div>
+                    <div id="liberar-msg" style="margin-top:10px; font-size:0.9rem;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== ABA ADMINISTRAÇÃO ========== -->
+        <div id="admin" class="tab-content">
+            <div class="estatisticas-container">
+                <h2>🗝️ Painel do Capitão</h2>
+                
+                <div class="pirate-card" style="padding:20px; margin-bottom:20px; border-color:var(--accent);">
+                    <h3>🔐 Acesso Administrativo</h3>
+                    <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;">
+                        <input type="password" id="admin-pass" placeholder="Senha do Capitão (pirata123)"
+                            style="padding:8px; border-radius:5px; border:1px solid var(--primary-dark); background:#1A0F0A; color:#fff; flex:1; min-width:180px;">
+                        <button onclick="verificarAdmin()" class="votar-btn" style="width:auto; margin:0;">Entrar no Painel</button>
+                    </div>
+                    <div id="admin-msg" style="margin-top:10px; font-size:0.9rem;"></div>
+                </div>
+
+                <!-- Conteúdo do admin (só aparece após senha correta) -->
+                <div id="admin-painel" style="display:none;">
+                    
+                    <!-- Configuração de Assentos -->
+                    <div class="pirate-card" style="padding:20px; margin-bottom:20px;">
+                        <h3>🪑 Configurar Assentos do Navio</h3>
+                        <p style="font-size:0.9rem; color:var(--text-dark); margin:8px 0;">
+                            Altere a quantidade de fileiras e assentos por fileira. Os assentos já ocupados serão mantidos se ainda existirem.
+                        </p>
+                        <div style="display:flex; gap:15px; flex-wrap:wrap; align-items:center; margin-top:12px;">
+                            <label>Fileiras:
+                                <input type="number" id="cfg-fileiras" min="3" max="15" value="8"
+                                    style="width:70px; padding:6px; margin-left:5px; border-radius:5px; border:1px solid var(--primary-dark); background:#1A0F0A; color:#fff;">
+                            </label>
+                            <label>Assentos por fileira:
+                                <input type="number" id="cfg-assentos" min="4" max="20" value="10"
+                                    style="width:70px; padding:6px; margin-left:5px; border-radius:5px; border:1px solid var(--primary-dark); background:#1A0F0A; color:#fff;">
+                            </label>
+                            <button onclick="salvarConfigAssentos()" class="votar-btn" style="width:auto; margin:0;">💾 Salvar Config</button>
+                        </div>
+                        <div id="cfg-msg" style="margin-top:10px; font-size:0.9rem;"></div>
+                    </div>
+
+                    <!-- Ações de reset -->
+                    <div class="pirate-card" style="padding:20px; margin-bottom:20px;">
+                        <h3>🔥 Ações de Limpeza</h3>
+                        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:12px;">
+                            <button onclick="adminZerarVotos()" class="votar-btn" style="width:auto; margin:0; background:var(--accent);">🔥 Zerar Todos os Votos</button>
+                            <button onclick="adminZerarAssentos()" class="votar-btn" style="width:auto; margin:0; background:var(--accent);">🪑 Liberar Todos os Assentos</button>
+                            <button onclick="adminZerarIPs()" class="votar-btn" style="width:auto; margin:0; background:var(--accent);">🌐 Zerar Todos os IPs</button>
+                            <button onclick="adminResetTotal()" class="votar-btn" style="width:auto; margin:0; background:#8B0000;">💀 Reset Completo</button>
+                        </div>
+                        <div id="reset-msg" style="margin-top:10px; font-size:0.9rem;"></div>
+                    </div>
+
+                    <!-- Lista de votos para exclusão individual -->
+                    <div class="pirate-card" style="padding:20px;">
+                        <h3>📜 Gerenciar Votos Individuais</h3>
+                        <button onclick="carregarListaVotosAdmin()" class="votar-btn" style="width:auto; margin:10px 0;">🔄 Atualizar Lista</button>
+                        <div id="lista-votos-admin" style="margin-top:15px; max-height:400px; overflow-y:auto;">
+                            <p style="color:var(--text-dark);">Clique em "Atualizar Lista" para ver os votos.</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
