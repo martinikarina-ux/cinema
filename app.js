@@ -27,6 +27,54 @@ let assentosOcupados = new Set(); // códigos ocupados
 let configAssentos = { numFileiras: 8, assentosPorFileira: 10 };
 let adminAutenticado = false;
 
+// ==========================================
+// MODAL CUSTOMIZADO (substitui alert/confirm)
+// ==========================================
+function mostrarAlerta(mensagem) {
+    return new Promise(resolve => {
+        const overlay = document.getElementById('modal-overlay');
+        const texto = document.getElementById('modal-texto');
+        const btnOk = document.getElementById('modal-btn-ok');
+        const btnCancel = document.getElementById('modal-btn-cancelar');
+
+        texto.textContent = mensagem;
+        btnCancel.style.display = 'none';
+        btnOk.textContent = 'OK';
+        overlay.style.display = 'flex';
+
+        const fechar = () => {
+            overlay.style.display = 'none';
+            btnOk.onclick = null;
+            resolve();
+        };
+        btnOk.onclick = fechar;
+    });
+}
+
+function mostrarConfirmacao(mensagem) {
+    return new Promise(resolve => {
+        const overlay = document.getElementById('modal-overlay');
+        const texto = document.getElementById('modal-texto');
+        const btnOk = document.getElementById('modal-btn-ok');
+        const btnCancel = document.getElementById('modal-btn-cancelar');
+
+        texto.textContent = mensagem;
+        btnCancel.style.display = 'inline-block';
+        btnOk.textContent = 'Confirmar';
+        btnCancel.textContent = 'Cancelar';
+        overlay.style.display = 'flex';
+
+        const limpar = () => {
+            overlay.style.display = 'none';
+            btnOk.onclick = null;
+            btnCancel.onclick = null;
+        };
+
+        btnOk.onclick = () => { limpar(); resolve(true); };
+        btnCancel.onclick = () => { limpar(); resolve(false); };
+    });
+}
+
 const FILMES_MOCK = [
     {
         id: 1,
@@ -259,9 +307,9 @@ function voltarParaAssentos() {
     irParaEtapa(2);
 }
 
-function irParaConfirmacao() {
+async function irParaConfirmacao() {
     if (!assentoSelecionado) {
-        alert('⚠️ Selecione um assento primeiro!');
+        await mostrarAlerta('⚠️ Selecione um assento primeiro!');
         return;
     }
     document.getElementById('resumo-nome').textContent = usuarioAtual.nome;
@@ -272,7 +320,7 @@ function irParaConfirmacao() {
 
 async function confirmarVotoFinal() {
     if (!usuarioAtual || !filmeSelecionado || !assentoSelecionado) {
-        alert('⚠️ Dados incompletos. Reinicie o processo.');
+        await mostrarAlerta('⚠️ Dados incompletos. Reinicie o processo.');
         irParaEtapa(1);
         return;
     }
@@ -285,20 +333,20 @@ async function confirmarVotoFinal() {
         const dados = await buscarDadosOnline();
 
         if (dados.ipsVotantes.includes(userIP)) {
-            alert(`⚠️ Seu IP (${userIP}) já registrou um voto! Cada pirata só pode votar uma vez.`);
+            await mostrarAlerta(`⚠️ Seu IP (${userIP}) já registrou um voto! Cada pirata só pode votar uma vez.`);
             if (statusText) statusText.textContent = `❌ IP já votou.`;
             return;
         }
 
         if (dados.ultimosVotantes.some(v => v.nome.toLowerCase() === usuarioAtual.nome.toLowerCase())) {
-            alert(`⚠️ O pirata "${usuarioAtual.nome}" já votou!`);
+            await mostrarAlerta(`⚠️ O pirata "${usuarioAtual.nome}" já votou!`);
             if (statusText) statusText.textContent = `❌ Este pirata já votou.`;
             return;
         }
 
         const ocupadosCodigos = dados.assentosOcupados.map(a => typeof a === 'string' ? a : a.codigo);
         if (ocupadosCodigos.includes(assentoSelecionado)) {
-            alert(`⚠️ O assento ${assentoSelecionado} acabou de ser ocupado! Escolha outro.`);
+            await mostrarAlerta(`⚠️ O assento ${assentoSelecionado} acabou de ser ocupado! Escolha outro.`);
             assentosOcupados.add(assentoSelecionado);
             assentoSelecionado = null;
             renderizarMapaAssentos();
@@ -334,13 +382,13 @@ async function confirmarVotoFinal() {
         if (statusText) {
             statusText.innerHTML = `✅ Voto de <strong>${usuarioAtual.nome}</strong> registrado! Assento ${assentoUsado}`;
         }
-        alert(`⚔️ Voto confirmado, Capitão ${usuarioAtual.nome}!\n🎬 ${filmeUsado}\n🪑 Assento: ${assentoUsado}`);
+        await mostrarAlerta(`⚔️ Voto confirmado, Capitão ${usuarioAtual.nome}!\n🎬 ${filmeUsado}\n🪑 Assento: ${assentoUsado}`);
 
         irParaEtapa(1);
         carregarFilmes();
 
     } catch (error) {
-        alert('❌ Não foi possível salvar o voto. Verifique a conexão / JSONBin.');
+        await mostrarAlerta('❌ Não foi possível salvar o voto. Verifique a conexão / JSONBin.');
         if (statusText) statusText.textContent = '❌ Falha ao salvar o voto.';
     }
 }
@@ -407,7 +455,7 @@ function renderizarMapaAssentos() {
 
 function selecionarAssento(codigo) {
     if (assentosOcupados.has(codigo)) {
-        alert(`⚠️ O assento ${codigo} já está ocupado!`);
+        mostrarAlerta(`⚠️ O assento ${codigo} já está ocupado!`);
         return;
     }
     assentoSelecionado = (assentoSelecionado === codigo) ? null : codigo;
@@ -594,7 +642,7 @@ async function salvarConfigAssentos() {
 
 async function adminZerarVotos() {
     if (!adminAutenticado) return;
-    if (!confirm('Tem certeza que deseja ZERAR TODOS os votos?')) return;
+    if (!(await mostrarConfirmacao('Tem certeza que deseja ZERAR TODOS os votos?'))) return;
     const msg = document.getElementById('reset-msg');
     try {
         const dados = await buscarDadosOnline();
@@ -609,7 +657,7 @@ async function adminZerarVotos() {
 
 async function adminZerarAssentos() {
     if (!adminAutenticado) return;
-    if (!confirm('Tem certeza que deseja LIBERAR TODOS os assentos?')) return;
+    if (!(await mostrarConfirmacao('Tem certeza que deseja LIBERAR TODOS os assentos?'))) return;
     const msg = document.getElementById('reset-msg');
     try {
         const dados = await buscarDadosOnline();
@@ -626,7 +674,7 @@ async function adminZerarAssentos() {
 
 async function adminZerarIPs() {
     if (!adminAutenticado) return;
-    if (!confirm('Tem certeza que deseja ZERAR TODOS os IPs?')) return;
+    if (!(await mostrarConfirmacao('Tem certeza que deseja ZERAR TODOS os IPs?'))) return;
     const msg = document.getElementById('reset-msg');
     try {
         const dados = await buscarDadosOnline();
@@ -640,8 +688,8 @@ async function adminZerarIPs() {
 
 async function adminResetTotal() {
     if (!adminAutenticado) return;
-    if (!confirm('💀 ATENÇÃO: Isso apaga VOTOS, ASSENTOS, IPs e USUÁRIOS. Continuar?')) return;
-    if (!confirm('Última confirmação: RESET COMPLETO do banco?')) return;
+    if (!(await mostrarConfirmacao('💀 ATENÇÃO: Isso apaga VOTOS, ASSENTOS, IPs e USUÁRIOS. Continuar?'))) return;
+    if (!(await mostrarConfirmacao('Última confirmação: RESET COMPLETO do banco?'))) return;
     const msg = document.getElementById('reset-msg');
     try {
         const dados = dadosPadrao();
@@ -680,7 +728,7 @@ async function carregarListaVotosAdmin() {
 
 async function adminExcluirVoto(index) {
     if (!adminAutenticado) return;
-    if (!confirm('Excluir este voto?')) return;
+    if (!(await mostrarConfirmacao('Excluir este voto?'))) return;
 
     try {
         const dados = await buscarDadosOnline();
@@ -711,9 +759,9 @@ async function adminExcluirVoto(index) {
         await salvarDadosOnline(dados);
         renderizarMapaAssentos();
         carregarListaVotosAdmin();
-        alert(`✅ Voto de ${removido.nome} excluído.`);
+        await mostrarAlerta(`✅ Voto de ${removido.nome} excluído.`);
     } catch (e) {
-        alert('❌ Erro ao excluir voto.');
+        await mostrarAlerta('❌ Erro ao excluir voto.');
     }
 }
 

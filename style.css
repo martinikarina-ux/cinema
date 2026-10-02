@@ -1106,3 +1106,48 @@ body::before {
     margin: 0;
     background: var(--accent);
 }
+
+
+/* ==========================================
+   MODAL CUSTOMIZADO (sem alert nativo)
+   ========================================== */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.75);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    padding: 20px;
+}
+
+.modal-box {
+    max-width: 400px;
+    width: 100%;
+    padding: 28px 24px;
+    text-align: center;
+    border-color: var(--gold-dark) !important;
+}
+
+.modal-box p {
+    color: var(--text-light);
+    font-size: 1.05rem;
+    line-height: 1.5;
+    margin-bottom: 22px;
+    white-space: pre-line;
+    font-family: 'MedievalSharp', cursive;
+}
+
+.modal-botoes {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.modal-botoes .votar-btn {
+    width: auto;
+    min-width: 100px;
+    margin: 0;
+}
